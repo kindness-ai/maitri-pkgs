@@ -46,7 +46,7 @@ jobs:
           # PKGBUILDs recompile. The "stable" release is the cache.
           if gh release download stable -R "${{ github.repository }}" -D /work/repo \
                -p '*.pkg.tar.zst' 2>/dev/null; then
-            echo "seeded $(ls /work/repo/*.pkg.tar.zst 2>/dev/null | wc -l) cached packages"
+            echo "seeded $(find /work/repo -maxdepth 1 -name '*.pkg.tar.zst' | wc -l) cached packages"
           else
             echo "no published release yet — full build"
           fi
@@ -84,7 +84,7 @@ jobs:
           cd /work/repo
           gh release view stable -R "${{ github.repository }}" >/dev/null 2>&1 \
             || gh release create stable -R "${{ github.repository }}" -t "maitri packages — stable" -n "Rolling maitri package channel."
-          gh release upload stable -R "${{ github.repository }}" --clobber \
+          gh release upload stable -R "${{ github.repository }}" --clobber -- \
             maitri.db maitri.db.tar.gz maitri.files maitri.files.tar.gz *.pkg.tar.zst *.sig
           # Delete any release asset no longer present locally — removes versions that
           # were superseded and pruned this run (--clobber only overwrites same-named
